@@ -183,14 +183,16 @@ WHERE s.artist_id IS NOT NULL;
 
 time_table_insert = ("""
 INSERT INTO time (start_time, hour, day, week, month, year, weekday)
-SELECT DISTINCT start_time,
-       EXTRACT(hour FROM start_time) AS hour,
-       EXTRACT(day FROM start_time) AS day,
-       EXTRACT(week FROM start_time) AS week,
-       EXTRACT(month FROM start_time) AS month,
-       EXTRACT(year FROM start_time) AS year,
-       EXTRACT(weekday FROM start_time) AS weekday
-FROM staging_events;
+SELECT DISTINCT 
+    TIMESTAMP 'epoch' + se.ts/1000 * INTERVAL '1 second' AS start_time,
+    EXTRACT(hour FROM TIMESTAMP 'epoch' + se.ts/1000 * INTERVAL '1 second') AS hour,
+    EXTRACT(day FROM TIMESTAMP 'epoch' + se.ts/1000 * INTERVAL '1 second') AS day,
+    EXTRACT(week FROM TIMESTAMP 'epoch' + se.ts/1000 * INTERVAL '1 second') AS week,
+    EXTRACT(month FROM TIMESTAMP 'epoch' + se.ts/1000 * INTERVAL '1 second') AS month,
+    EXTRACT(year FROM TIMESTAMP 'epoch' + se.ts/1000 * INTERVAL '1 second') AS year,
+    EXTRACT(weekday FROM TIMESTAMP 'epoch' + se.ts/1000 * INTERVAL '1 second') AS weekday
+FROM staging_events se
+WHERE se.ts IS NOT NULL;
 """)
 
 # QUERY LISTS
