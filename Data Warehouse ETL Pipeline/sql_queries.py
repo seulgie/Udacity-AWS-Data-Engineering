@@ -132,19 +132,20 @@ staging_songs_copy = ("""
 
 songplay_table_insert = ("""
 INSERT INTO songplays (start_time, user_id, level, song_id, artist_id, session_id, location, user_agent)
-SELECT DISTINCT TIMESTAMP 'epoch' + e.ts / 1000 * INTERVAL '1 second' AS start_time,
-       e.userId AS user_id,
-       e.level AS level,
-       s.song_id AS song_id,
-       s.artist_id AS artist_id,
-       e.sessionId AS session_id,
-       e.location AS location,
-       e.userAgent AS user_agent
-FROM staging_events e
-JOIN staging_songs s
-  ON e.song = s.title
- AND e.artist = s.artist_name
-WHERE e.page = 'NextSong';
+SELECT 
+    TIMESTAMP 'epoch' + se.ts/1000 * INTERVAL '1 second' AS start_time,
+    se.userId, 
+    se.level, 
+    ss.song_id, 
+    ss.artist_id, 
+    se.sessionId, 
+    se.location, 
+    se.userAgent
+FROM staging_events se
+JOIN staging_songs ss 
+    ON se.song = ss.title 
+    AND se.artist = ss.artist_name
+WHERE se.page = 'NextSong';
 """)
 
 user_table_insert = ("""
